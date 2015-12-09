@@ -6,7 +6,10 @@ import android.os.PersistableBundle
 import android.util.Log
 import android.view.KeyEvent
 import android.view.Window
+import android.view.WindowManager
 import android.widget.Toast
+import jp.ac.kcg.projectexercises.color.ColorRegister
+import jp.ac.kcg.projectexercises.config.ConfigurationRegister
 
 
 import java.util.ArrayList
@@ -16,12 +19,22 @@ import java.util.ArrayList
  */
 open class ApplicationActivity : DialogActivity() {
     private val onFinishCallbacks = ArrayList<() -> Unit>()
-
+    private val onRefreshLayoutCallbacks = ArrayList<() -> Unit>()
+    private val colorChangeCallback: () -> Unit = { onRefreshLayoutCallbacks.forEach { it() } }
+    private var colorChange = false
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.v(toString(), "onCreate()")
         window.requestFeature(Window.FEATURE_ACTION_BAR)
         super.onCreate(savedInstanceState)
         supportActionBar.setDisplayHomeAsUpEnabled(true)
+
+        if (ConfigurationRegister.EitherConfigurations.SLEEPLESS.isEnabled) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        }
+        ColorRegister.instance.addOnColorChangeCallback {
+            colorChangeCallback()
+            colorChange = true
+        }
     }
 
     override final fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
@@ -30,6 +43,17 @@ open class ApplicationActivity : DialogActivity() {
 
     override fun onResume() {
         Log.v(toString(), "onResume()")
+        if (ConfigurationRegister.EitherConfigurations.SLEEPLESS.isEnabled) {
+            window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        } else {
+            if (ConfigurationRegister.EitherConfigurations.SLEEPLESS.isEnabled) {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+        }
+        if (colorChange) {
+            colorChange = false
+            colorChangeCallback()
+        }
         super.onResume()
     }
 
@@ -96,6 +120,14 @@ open class ApplicationActivity : DialogActivity() {
      */
     fun addOnFinishCallback(finishCallback: () -> Unit) {
         onFinishCallbacks.add(finishCallback)
+    }
+
+    fun addRefreshLayoutCallbacks(refresh: () -> Unit) {
+        onRefreshLayoutCallbacks.add(refresh)
+    }
+
+    fun removeRefreshLayoutCallbacks(refresh: () -> Unit) {
+        onRefreshLayoutCallbacks.remove(refresh)
     }
 
     override fun finish() {

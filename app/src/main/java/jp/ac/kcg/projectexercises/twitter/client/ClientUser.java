@@ -44,10 +44,10 @@ public final class ClientUser {
         originalProfileImageUrl = user.getOriginalProfileImageURL();
 
         this.accessToken = accessToken;
-        TwitterStream twitterStream = TwitterStreamFactory.getSingleton();
+        TwitterStream twitterStream =new TwitterStreamFactory().getInstance();
         twitterStream.setOAuthConsumer(context.getString(R.string.api_key), context.getString(R.string.api_secret));
         twitterStream.setOAuthAccessToken(accessToken);
-        StreamImpl streamImpl = new StreamImpl();
+        StreamImpl streamImpl = new StreamImpl(this);
         twitterStream.addListener(streamImpl);
         twitterStream.user();
         stream = streamImpl;

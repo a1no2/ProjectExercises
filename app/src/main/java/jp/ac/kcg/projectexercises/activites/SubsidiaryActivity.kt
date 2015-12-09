@@ -3,6 +3,7 @@ package jp.ac.kcg.projectexercises.activites
 import android.content.Intent
 import android.view.KeyEvent
 import android.view.MenuItem
+import jp.ac.kcg.projectexercises.main.Global
 
 import jp.ac.kcg.projectexercises.main.MainActivity
 
@@ -12,6 +13,13 @@ import jp.ac.kcg.projectexercises.main.MainActivity
 open class SubsidiaryActivity : ApplicationActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (!Global.instance.isActiveMainActivity) {
+                startActivity(MainActivity::class.java, true)
+            } else {
+                super.supportFinishAfterTransition()
+            }
+        }
         return super.onKeyDown(keyCode, event)
     }
 
