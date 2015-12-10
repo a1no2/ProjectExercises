@@ -5,7 +5,6 @@ import android.os.Bundle
 import jp.ac.kcg.projectexercises.activites.ThreadPoolHolder
 import jp.ac.kcg.projectexercises.twitter.client.ClientUser
 import jp.ac.kcg.projectexercises.twitter.tweet.listview.TweetListAdapter
-import twitter4j.Paging
 import twitter4j.TwitterException
 
 /**
