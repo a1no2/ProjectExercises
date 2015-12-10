@@ -39,8 +39,22 @@ class TweetListAdapter(context: Context, resource: Int, private val tweets: Muta
 
         view.icon_image.setImage(true, SmartImageView.ProgressType.LOAD_ICON, tweet.user.biggerProfileImageUrl)
 
-        view.main_text.text = "${tweet.user.screenName}\n${tweet.user.name}\n${tweet.text}"
-        view.main_text.textSize = ConfigurationRegister.NumericalConfigurations.CHARACTER_SIZE.numericValue.toFloat() + 8
+        view.screen_name_text.text = tweet.user.screenName
+        view.name_text.text = tweet.user.name
+
+        view.created_at_text.text = tweet.createdAt
+
+
+        view.main_text.text = tweet.text
+
+        val textSize = ConfigurationRegister.NumericalConfigurations.CHARACTER_SIZE.numericValue.toFloat() + 8
+        view.main_text.textSize = textSize
+        view.name_text.textSize = textSize * 0.85.toFloat()
+        view.screen_name_text.textSize = textSize * 0.85.toFloat()
+        view.created_at_text.textSize = textSize * 0.85.toFloat()
+
+        view.favorite_image.visibility = if (tweet.isRetweeted) View.VISIBLE else View.GONE
+
         if (isRt) {
             view.overlay_linear.setBackgroundColor(ColorRegister.Color.RT_ITEM.getTransColor("AA"))
             return view

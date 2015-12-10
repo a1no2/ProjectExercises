@@ -5,7 +5,6 @@ import jp.ac.kcg.projectexercises.activites.ThreadPoolHolder
 
 import jp.ac.kcg.projectexercises.twitter.client.ClientUser
 import jp.ac.kcg.projectexercises.twitter.tweet.listview.TweetListAdapter
-import twitter4j.Paging
 import twitter4j.TwitterException
 
 
@@ -14,7 +13,6 @@ import twitter4j.TwitterException
 class FavoritesFragment : TweetsFragment() {
 
     private var screenName: String? = null
-
 
     override fun initialize(clientUser: ClientUser, tweetListAdapter: TweetListAdapter, bundle: Bundle?) {
         val screenName = arguments.getString(EXTRA_SCREEN_NAME) ?: throw NullPointerException("screenNameがセットされていない")

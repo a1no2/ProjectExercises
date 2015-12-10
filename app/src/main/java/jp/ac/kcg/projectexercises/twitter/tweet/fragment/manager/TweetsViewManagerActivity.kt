@@ -47,8 +47,8 @@ class TweetsViewManagerActivity : SubsidiaryActivity() {
 
         add_home_button.setOnClickListener { v -> addHomeTimelineTweetsView() }
         add_mentions_button.setOnClickListener { v -> addMentionsTweetsView() }
-        //  add_list_button!!.setOnClickListener { v -> addUserListTweetsView() }
-        //addUserLists()
+        add_list_button!!.setOnClickListener { v -> addUserListTweetsView() }
+        addUserLists()
         setOnClickListener()
     }
 
@@ -70,51 +70,15 @@ class TweetsViewManagerActivity : SubsidiaryActivity() {
         })
     }
 
-    /*private fun addUserListTweetsView() {
-        val listNames = ArrayList<CharSequence>()
-        for (clientUser in clientUsers) {
-            for (userList in userListMap[clientUser]!!) {
-                listNames.add(userList.fullName)
-            }
-        }
-        val alertDialog = AlertDialog.Builder(this).setTitle(getString(R.string.dialog_title_choose_list)).setItems(listNames.toArray<CharSequence>(arrayOfNulls<CharSequence>(listNames.size))) { dialog, which ->
-            val listName = listNames[which].toString()
-            var clientUser: ClientUser?
-            var userList: UserList? = null
-            for (user in clientUsers) {
-                for (list in userListMap[user]!!) {
-                    if (list.fullName == listName) {
-                        userList = list
-                        clientUser = user
-                        val tweetsViewTable = TweetsViewManager.TweetsViewTable(TweetsViewManager.TweetsViewType.LIST_USER,
-                                clientUser, list.id, list.name)
-                        add(tweetsViewTable)
-                        break
-                    }
-                }
-                if (userList != null) break
-            }
-        }.create()
-        showDialog(alertDialog)
-    }*/
+    /**
+     *
+     */
+    private fun addUserListTweetsView() {
+    }
 
-    /*  private fun addUserLists() {
-          if (clientUsers.size > addUserListCount) {
-              clientUsers[addUserListCount].twitterApiClient.userListService.list(null, null, true, object : Callback<List<UserList>>() {
-                  override fun success(result: Result<List<UserList>>) {
-                      userListMap.put(clientUsers[addUserListCount], result.data as List<UserList>)
-                      addUserListCount++
-                      addUserLists()
-                  }
+    private fun addUserLists() {
 
-                  override fun failure(e: TwitterException) {
-                      sendToast(e.message!!)
-                  }
-              })
-          } else {
-              add_list_button.isEnabled = true
-          }
-      }*/
+    }
 
     private fun showUsersDialog(listener: (clientUser: ClientUser) -> Unit) {
         val userNames = ArrayList<CharSequence>()
