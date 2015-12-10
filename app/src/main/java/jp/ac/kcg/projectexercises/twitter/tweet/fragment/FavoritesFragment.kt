@@ -14,7 +14,6 @@ class FavoritesFragment : TweetsFragment() {
 
     private var screenName: String? = null
 
-
     override fun initialize(clientUser: ClientUser, tweetListAdapter: TweetListAdapter, bundle: Bundle?) {
         val screenName = arguments.getString(EXTRA_SCREEN_NAME) ?: throw NullPointerException("screenNameがセットされていない")
 

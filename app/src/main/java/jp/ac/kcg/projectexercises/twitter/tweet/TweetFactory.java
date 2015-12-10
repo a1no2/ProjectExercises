@@ -41,4 +41,12 @@ public final class TweetFactory {
         return map;
     }
 
+    private void startObserveTweetState(ClientUser clientUser, Map<Long, TweetImpl> observedTweetMap) {
+        clientUser.getStream()
+                .addOnFavoriteListener((source, target, favoritedTweet) -> {
+
+                });
+
+    }
+
 }
