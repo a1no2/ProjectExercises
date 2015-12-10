@@ -4,6 +4,8 @@ import android.os.Handler
 import com.j256.ormlite.field.DatabaseField
 import com.j256.ormlite.table.DatabaseTable
 import jp.ac.kcg.projectexercises.main.Global
+import jp.ac.kcg.projectexercises.twitter.tweet.fragment.manager.TweetsViewManager
+import jp.ac.kcg.projectexercises.twitter.tweet.fragment.manager.TweetsViewManagerActivity
 import jp.ac.kcg.projectexercises.utill.Register
 import twitter4j.TwitterException
 import twitter4j.auth.AccessToken
@@ -92,6 +94,7 @@ final class ClientUsers private constructor() : Register() {
         handleDao<ClientUserTable, String>(context, ClientUserTable::class.java) {
             it.delete(ClientUserTable(clientUser))
             onDeleteListener(clientUser)
+            TweetsViewManager.instance.deleteTweetsViewByClientUser(clientUser)
             clientUsers.remove(clientUser)
         }
     }

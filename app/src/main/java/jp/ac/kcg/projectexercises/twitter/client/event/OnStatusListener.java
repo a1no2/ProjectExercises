@@ -1,13 +1,13 @@
 package jp.ac.kcg.projectexercises.twitter.client.event;
 
-import twitter4j.Status;
+import jp.ac.kcg.projectexercises.twitter.tweet.Tweet;
 
 /**
  * OnStatusListener
  */
 public interface OnStatusListener {
     /**
-     * @param status ステータス
+     * @param tweet ツイート
      */
-    void onStatus(Status status);
+    void onStatus(Tweet tweet);
 }

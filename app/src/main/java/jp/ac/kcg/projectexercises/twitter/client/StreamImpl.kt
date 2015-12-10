@@ -9,6 +9,7 @@ import jp.ac.kcg.projectexercises.twitter.client.event.OnStatusListener
 import jp.ac.kcg.projectexercises.twitter.client.event.OnUnBlockListener
 import jp.ac.kcg.projectexercises.twitter.client.event.OnUnFavoriteListener
 import jp.ac.kcg.projectexercises.twitter.client.event.OnUnFollowListener
+import jp.ac.kcg.projectexercises.twitter.tweet.TweetFactory
 import twitter4j.DirectMessage
 import twitter4j.StallWarning
 import twitter4j.Status
@@ -20,7 +21,7 @@ import java.util.*
 
 /**
  */
-final class StreamImpl : Stream, UserStreamListener {
+final class StreamImpl(val clientUser: ClientUser) : Stream, UserStreamListener {
 
     private val onStatusListeners = ArrayList<OnStatusListener>()
     private val onDeletionNoticeListener = ArrayList<OnDeletionNoticeListener>()
@@ -123,11 +124,13 @@ final class StreamImpl : Stream, UserStreamListener {
     }
 
     override fun onFavorite(source: User, target: User, favoritedStatus: Status) {
-        onFavoriteListeners.forEach { it.onFavorite(source, target, favoritedStatus) }
+        val tweet = TweetFactory.instance.createOrGetTweet(clientUser, favoritedStatus)
+        onFavoriteListeners.forEach { it.onFavorite(source, target, tweet) }
     }
 
     override fun onUnfavorite(source: User, target: User, unfavoritedStatus: Status) {
-        onUnFavoriteListener.forEach { it.onUnFavorite(source, target, unfavoritedStatus) }
+        val tweet = TweetFactory.instance.createOrGetTweet(clientUser, unfavoritedStatus)
+        onUnFavoriteListener.forEach { it.onUnFavorite(source, target, tweet) }
     }
 
     override fun onFollow(source: User, followedUser: User) {
@@ -203,8 +206,10 @@ final class StreamImpl : Stream, UserStreamListener {
     }
 
     override fun onStatus(status: Status) {
-        if (!deletedStatusIds.any { it.equals(status.id) })
-            onStatusListeners.forEach { it.onStatus(status) }
+        if (!deletedStatusIds.any { it.equals(status.id) }) {
+            val tweet = TweetFactory.instance.createOrGetTweet(clientUser, status)
+            onStatusListeners.forEach { it.onStatus(tweet) }
+        }
     }
 
     override fun onDeletionNotice(statusDeletionNotice: StatusDeletionNotice) {

@@ -9,6 +9,7 @@ import jp.ac.kcg.projectexercises.R
 import jp.ac.kcg.projectexercises.activites.SubsidiaryActivity
 import jp.ac.kcg.projectexercises.main.Global
 import jp.ac.kcg.projectexercises.main.MainActivity
+import jp.ac.kcg.projectexercises.twitter.tweet.fragment.manager.TweetsViewManager
 
 import java.util.ArrayList
 
@@ -41,9 +42,7 @@ final class ClientUsersManagerActivity : SubsidiaryActivity() {
             adapter!!.remove(it)
         }
 
-        twitter_login_button.setOnClickListener {
-            oauthStart()
-        }
+        twitter_login_button.setOnClickListener { oauthStart() }
     }
 
     private var oauth: OAuthAuthorization? = null
@@ -107,6 +106,10 @@ final class ClientUsersManagerActivity : SubsidiaryActivity() {
     }
 
     override fun finish() {
+        if (TweetsViewManager.instance.isChanged && Global.instance.isActiveMainActivity) {
+            Global.instance.destroyMainActivity()
+            startActivity(MainActivity::class.java, false)
+        }
         super.finish()
     }
 

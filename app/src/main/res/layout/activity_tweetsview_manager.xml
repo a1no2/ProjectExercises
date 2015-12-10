@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <jp.ac.kcg.projectexercises.listview.DragAndDroppableListView
+        android:id="@+id/fragment_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_table" />
+
+
+    <TableRow
+        android:id="@+id/bottom_table"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/transparency"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/add_home_button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:background="@color/transparency"
+            android:text="@string/add_home"
+            android:textColor="@color/button_text_dark"
+            tools:ignore="ButtonStyle" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="32dp"
+            android:background="@color/trans_light" />
+
+        <Button
+            android:id="@+id/add_mentions_button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:background="@color/transparency"
+            android:text="@string/add_mentions"
+            android:textColor="@color/button_text_dark"
+            tools:ignore="ButtonStyle" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="32dp"
+            android:background="@color/trans_light" />
+
+        <Button
+            android:id="@+id/add_list_button"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:background="@color/transparency"
+            android:text="@string/add_list"
+            android:textColor="@color/button_text_dark"
+            tools:ignore="ButtonStyle" />
+
+
+    </TableRow>
+</RelativeLayout>

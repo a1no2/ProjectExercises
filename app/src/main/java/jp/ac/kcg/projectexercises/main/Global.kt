@@ -31,7 +31,7 @@ class Global private constructor() {
      * @return true : 生きている false : 死んでいる
      */
     val isActiveMainActivity: Boolean
-        get() = mainActivityContext == null || !(mainActivityContext?.isFinishing ?: true)
+        get() = mainActivityContext == null || !(mainActivityContext!!.isFinishing)
 
 
     companion object {
