@@ -111,4 +111,5 @@
     <string name="dialog_message_confirm_choose_item_home">選択したビューをホームに設定しますか？</string>
     <string name="info_saved">保存しました</string>
     <string name="max_tweet_length">140</string>
+    <string name="licenses">権利表記</string>
 </resources>
