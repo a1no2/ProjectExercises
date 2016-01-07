@@ -98,12 +98,14 @@ abstract class TweetsFragment : Fragment() {
                     if (!tweets.isEmpty()) {
                         if (maxStatusId != null) tweets.removeAt(0)
                         if (sinceStatusId != null) {
-                            for (i in tweets.indices) {
-                                activity.runOnUiThread {
+
+                            activity.runOnUiThread {
+                                for (i in tweets.indices) {
+
                                     adapter!!.insert(TweetFactory.instance.createOrGetTweet(clientUser!!, tweets[i]), i)
                                 }
+                                tweetListView!!.setSelection(tweets.size)
                             }
-                            tweetListView!!.setSelection(tweets.size)
                         } else {
                             for (tweet in tweets) {
                                 activity.runOnUiThread {
