@@ -1,6 +1,7 @@
 package jp.ac.kcg.projectexercises.twitter.tweet.fragment.manager
 
 import android.os.Bundle
+import android.os.Handler
 import android.support.v7.app.AlertDialog
 import android.widget.AdapterView
 import jp.ac.kcg.projectexercises.R
@@ -10,9 +11,9 @@ import jp.ac.kcg.projectexercises.main.MainActivity
 import jp.ac.kcg.projectexercises.twitter.client.ClientUser
 import jp.ac.kcg.projectexercises.twitter.client.ClientUsers
 
-import java.util.ArrayList
-
-import kotlinx.android.synthetic.activity_tweetsview_manager.*
+import kotlinx.android.synthetic.main.activity_tweetsview_manager.*
+import twitter4j.UserList
+import java.util.*
 
 /**
  */
@@ -22,9 +23,8 @@ class TweetsViewManagerActivity : SubsidiaryActivity() {
 
     private var tables: MutableList<TweetsViewManager.TweetsViewTable>? = null
     private var adapter: TweetsViewListAdapter? = null
-    // private val userListMap = LinkedHashMap<ClientUser, List<UserList>>()
+    private val userListMap = LinkedHashMap<ClientUser, List<UserList>>()
     private val clientUsers = ArrayList<ClientUser>()
-    private var addUserListCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +47,6 @@ class TweetsViewManagerActivity : SubsidiaryActivity() {
 
         add_home_button.setOnClickListener { v -> addHomeTimelineTweetsView() }
         add_mentions_button.setOnClickListener { v -> addMentionsTweetsView() }
-        add_list_button!!.setOnClickListener { v -> addUserListTweetsView() }
         addUserLists()
         setOnClickListener()
     }
@@ -70,14 +69,48 @@ class TweetsViewManagerActivity : SubsidiaryActivity() {
         })
     }
 
-    /**
-     *
-     */
     private fun addUserListTweetsView() {
+        val listNames = ArrayList<CharSequence>()
+        userListMap.forEach { lists ->
+            lists.value.forEach {
+                listNames.add(it.fullName)
+            }
+        }
+
+        val dialog = AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_title_choose_list)
+                .setItems(listNames.toArray<CharSequence>(arrayOfNulls(listNames.size)))
+                { dialog, which ->
+                    userListMap.forEach listMapForEach@ { lists ->
+                        lists.value.forEach {
+                            if (it.fullName == listNames[which]) {
+                                val table = TweetsViewManager.TweetsViewTable(
+                                        TweetsViewManager.TweetsViewType.LIST_USER,
+                                        lists.key,
+                                        it.id,
+                                        it.name
+                                )
+                                add(table)
+                                return@listMapForEach
+                            }
+                        }
+                    }
+                }.create()
+        showDialog(dialog)
     }
 
     private fun addUserLists() {
-
+        clientUsers.forEach {
+            val handler = Handler()
+            execute(Runnable {
+                val userLists = it.twitter.getUserLists(it.userId)
+                userListMap.put(it, userLists)
+                handler.post {
+                    add_list_button!!.setOnClickListener { v -> addUserListTweetsView() }
+                    add_list_button.isEnabled = true
+                }
+            })
+        }
     }
 
     private fun showUsersDialog(listener: (clientUser: ClientUser) -> Unit) {
@@ -87,15 +120,16 @@ class TweetsViewManagerActivity : SubsidiaryActivity() {
             userNames.add(clientUser.screenName)
             clientUsers.add(clientUser)
         }
-        val alertDialog = AlertDialog.Builder(this).setTitle(getString(R.string.dialog_title_choose_user)).setItems(userNames.toArray<CharSequence>(arrayOfNulls<CharSequence>(userNames.size))) { dialog, which ->
-            dialog.dismiss()
-            for (clientUser in clientUsers) {
-                if (clientUser.screenName == userNames[which]) {
-                    listener(clientUser)
-                    break
-                }
-            }
-        }.create()
+        val alertDialog = AlertDialog.Builder(this).setTitle(getString(R.string.dialog_title_choose_user))
+                .setItems(userNames.toArray<CharSequence>(arrayOfNulls<CharSequence>(userNames.size)))
+                { dialog, which ->
+                    for (clientUser in clientUsers) {
+                        if (clientUser.screenName == userNames[which]) {
+                            listener(clientUser)
+                            break
+                        }
+                    }
+                }.create()
         showDialog(alertDialog)
     }
 

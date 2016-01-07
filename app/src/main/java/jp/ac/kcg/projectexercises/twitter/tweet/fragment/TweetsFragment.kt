@@ -31,7 +31,6 @@ abstract class TweetsFragment : Fragment() {
     protected var tweetListView: TweetListView? = null
         private set
     protected var clientUser: ClientUser? = null
-        public set
     protected var adapter: TweetListAdapter? = null
         private set
     protected var swipeRefreshLayout: SwipeRefreshLayout? = null
@@ -100,7 +99,9 @@ abstract class TweetsFragment : Fragment() {
                         if (maxStatusId != null) tweets.removeAt(0)
                         if (sinceStatusId != null) {
                             for (i in tweets.indices) {
-                                adapter!!.insert(TweetFactory.instance.createOrGetTweet(clientUser!!, tweets[i]), i)
+                                activity.runOnUiThread {
+                                    adapter!!.insert(TweetFactory.instance.createOrGetTweet(clientUser!!, tweets[i]), i)
+                                }
                             }
                             tweetListView!!.setSelection(tweets.size)
                         } else {
@@ -114,7 +115,9 @@ abstract class TweetsFragment : Fragment() {
                         sendToast(getString(R.string.info_no_tweets_to_read_was))
                     }
                     tweetListView!!.attachedBottomCallbackEnabled(true)
-                    swipeRefreshLayout!!.isRefreshing = false
+                    activity.runOnUiThread {
+                        swipeRefreshLayout!!.isRefreshing = false
+                    }
                 }
             }
 
