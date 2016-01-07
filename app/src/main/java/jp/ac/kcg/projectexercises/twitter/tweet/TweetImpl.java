@@ -9,6 +9,8 @@ import java.util.List;
 import jp.ac.kcg.projectexercises.twitter.client.ClientUser;
 import jp.ac.kcg.projectexercises.twitter.user.TwitterUser;
 import jp.ac.kcg.projectexercises.twitter.user.TwitterUserFactory;
+import kotlin.CollectionsKt;
+import kotlin.jvm.internal.KotlinClass;
 import twitter4j.HashtagEntity;
 import twitter4j.MediaEntity;
 import twitter4j.Status;
@@ -88,16 +90,16 @@ final class TweetImpl implements Tweet {
     }
 
     private static void setUserEntities(TweetImpl tweet, Status status) {
-        tweet.involvedUserNames.add(tweet.user.getName());
-
+        tweet.involvedUserNames.add(tweet.user.getScreenName());
+        tweet.mentionEntityUserNames.add(tweet.user.getScreenName());
         for (UserMentionEntity userMentionEntity : status.getUserMentionEntities()) {
-            if ((tweet.clientUser.getUserId() != userMentionEntity.getId())) {
-                tweet.mentionEntityUserNames.add(userMentionEntity.getName());
-                tweet.involvedUserNames.add(userMentionEntity.getName());
-            } else {
+            if ((tweet.clientUser.getUserId() == userMentionEntity.getId()))
                 tweet.isMention = true;
-            }
+            tweet.mentionEntityUserNames.add(userMentionEntity.getScreenName());
+            tweet.involvedUserNames.add(userMentionEntity.getScreenName());
         }
+        tweet.mentionEntityUserNames = CollectionsKt.distinct(tweet.mentionEntityUserNames);
+        tweet.involvedUserNames = CollectionsKt.distinct(tweet.involvedUserNames);
     }
 
     private static void setUris(TweetImpl tweet, Status status) {
@@ -200,5 +202,13 @@ final class TweetImpl implements Tweet {
     @Override
     public TwitterUser getUser() {
         return user;
+    }
+
+    void setRetweeted(boolean isRetweeted) {
+        this.isRetweeted = isRetweeted;
+    }
+
+    void setFavorited(boolean isFavorited) {
+        this.isFavorited = isFavorited;
     }
 }

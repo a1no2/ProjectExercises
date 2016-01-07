@@ -10,13 +10,14 @@ import android.widget.Toast
 import jp.ac.kcg.projectexercises.R
 import jp.ac.kcg.projectexercises.activites.ApplicationActivity
 import jp.ac.kcg.projectexercises.config.ConfigActivity
+import jp.ac.kcg.projectexercises.twitter.TweetActivity
 import jp.ac.kcg.projectexercises.twitter.client.ClientUsers
 import jp.ac.kcg.projectexercises.twitter.client.ClientUsersManagerActivity
 import jp.ac.kcg.projectexercises.twitter.tweet.fragment.TweetsFragmentPagerAdapter
 import jp.ac.kcg.projectexercises.twitter.tweet.fragment.manager.TweetsViewManager
 import jp.ac.kcg.projectexercises.twitter.tweet.fragment.manager.TweetsViewManagerActivity
 
-import kotlinx.android.synthetic.activity_main.*
+import kotlinx.android.synthetic.main.activity_main.*
 
 final class MainActivity : ApplicationActivity() {
     private var adapter: TweetsFragmentPagerAdapter? = null
@@ -53,6 +54,7 @@ final class MainActivity : ApplicationActivity() {
 
     private fun initComponent() {
         start_tweet_button.isEnabled = true
+        start_tweet_button.setOnClickListener { startActivity(TweetActivity::class.java, false) }
         adapter = TweetsFragmentPagerAdapter(supportFragmentManager)
         pager.offscreenPageLimit = 30
         pager_tab_strip.drawFullUnderline = true

@@ -4,6 +4,7 @@ package jp.ac.kcg.projectexercises.twitter.client;
 import android.content.Context;
 
 import jp.ac.kcg.projectexercises.R;
+import jp.ac.kcg.projectexercises.twitter.tweet.TweetBuilder;
 import lombok.Getter;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -44,7 +45,7 @@ public final class ClientUser {
         originalProfileImageUrl = user.getOriginalProfileImageURL();
 
         this.accessToken = accessToken;
-        TwitterStream twitterStream =new TwitterStreamFactory().getInstance();
+        TwitterStream twitterStream = new TwitterStreamFactory().getInstance();
         twitterStream.setOAuthConsumer(context.getString(R.string.api_key), context.getString(R.string.api_secret));
         twitterStream.setOAuthAccessToken(accessToken);
         StreamImpl streamImpl = new StreamImpl(this);
@@ -88,4 +89,9 @@ public final class ClientUser {
     public String getOriginalProfileImageUrl() {
         return originalProfileImageUrl;
     }
+
+    public TweetBuilder getTweetBuilder() {
+        return new TweetBuilder(this);
+    }
+
 }

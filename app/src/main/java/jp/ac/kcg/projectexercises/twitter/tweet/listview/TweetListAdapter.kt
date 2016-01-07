@@ -53,7 +53,7 @@ class TweetListAdapter(context: Context, resource: Int, private val tweets: Muta
         view.screen_name_text.textSize = textSize * 0.85.toFloat()
         view.created_at_text.textSize = textSize * 0.85.toFloat()
 
-        view.favorite_image.visibility = if (tweet.isRetweeted) View.VISIBLE else View.GONE
+        view.favorite_image.visibility = if (tweet.isFavorited) View.VISIBLE else View.GONE
 
         if (isRt) {
             view.overlay_linear.setBackgroundColor(ColorRegister.Color.RT_ITEM.getTransColor("AA"))

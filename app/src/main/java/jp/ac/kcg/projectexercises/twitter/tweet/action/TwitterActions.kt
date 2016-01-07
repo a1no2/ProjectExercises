@@ -5,6 +5,7 @@ import android.net.Uri
 import android.support.v7.app.AlertDialog
 import jp.ac.kcg.projectexercises.R
 import jp.ac.kcg.projectexercises.activites.ApplicationActivity
+import jp.ac.kcg.projectexercises.twitter.TweetActivity
 import jp.ac.kcg.projectexercises.twitter.client.ClientUser
 import jp.ac.kcg.projectexercises.twitter.tweet.Tweet
 import twitter4j.TwitterException
@@ -21,19 +22,20 @@ class TwitterActions(private val applicationActivity: ApplicationActivity, priva
     private val threadPool: ExecutorService = Executors.newCachedThreadPool()
 
     fun action(action: Action, tweet: Tweet) {
+        val targetTweet = if (tweet.isRt) tweet.retweetedStatus else tweet
         when (action) {
-            TwitterActions.Action.REPLY -> reply(tweet)
-            TwitterActions.Action.FAVORITE -> favorite(tweet)
-            TwitterActions.Action.CONFIRM_FAVORITE -> confirmFavorite(tweet)
-            TwitterActions.Action.RT -> retweet(tweet)
-            TwitterActions.Action.CONFIRM_RT -> confirmRetweet(tweet)
-            TwitterActions.Action.QT -> quoteRetweet(tweet)
-            TwitterActions.Action.OPEN_TWEET_DETAIL -> openTweetDetail(tweet)
-            TwitterActions.Action.SHOW_CONVERSATION -> showConversation(tweet)
+            TwitterActions.Action.REPLY -> reply(targetTweet)
+            TwitterActions.Action.FAVORITE -> favorite(targetTweet)
+            TwitterActions.Action.CONFIRM_FAVORITE -> confirmFavorite(targetTweet)
+            TwitterActions.Action.RT -> retweet(targetTweet)
+            TwitterActions.Action.CONFIRM_RT -> confirmRetweet(targetTweet)
+            TwitterActions.Action.QT -> quoteRetweet(targetTweet)
+            TwitterActions.Action.OPEN_TWEET_DETAIL -> openTweetDetail(targetTweet)
+            TwitterActions.Action.SHOW_CONVERSATION -> showConversation(targetTweet)
             TwitterActions.Action.MENU -> showMenu(tweet)
-            TwitterActions.Action.SHOW_MEDIA -> showMedia(tweet.imageUris)
-            TwitterActions.Action.OPEN_USER_PROFILE -> openUserProfile(tweet)
-            TwitterActions.Action.ALL_TAG_TWEET -> hashtagsTweet(tweet)
+            TwitterActions.Action.SHOW_MEDIA -> showMedia(targetTweet.imageUris)
+            TwitterActions.Action.OPEN_USER_PROFILE -> openUserProfile(targetTweet)
+            TwitterActions.Action.ALL_TAG_TWEET -> hashtagsTweet(targetTweet)
             TwitterActions.Action.OPEN_TWEET_ACTIVITY -> openTweetActivity()
             TwitterActions.Action.ACTION_NONE -> {
             }
@@ -43,8 +45,7 @@ class TwitterActions(private val applicationActivity: ApplicationActivity, priva
     }
 
     private fun confirmRetweet(tweet: Tweet) {
-        val tweet1 = if (tweet.isRt) tweet.retweetedStatus else tweet
-        val message = if (tweet1.isRetweeted)
+        val message = if (tweet.isRetweeted)
             applicationActivity.getString(R.string.dialog_message_confirmation_tweet_unretweet)
         else
             applicationActivity.getString(R.string.dialog_message_confirmation_tweet_retweet)
@@ -54,7 +55,7 @@ class TwitterActions(private val applicationActivity: ApplicationActivity, priva
                     .setMessage(message).setNegativeButton(applicationActivity.getString(R.string.cancel), null)
                     .setPositiveButton(applicationActivity.getString(R.string.yes)) {
                         dialog, id ->
-                        retweet(tweet1)
+                        retweet(tweet)
                     }.create()
             applicationActivity.showDialog(alertDialog)
         }
@@ -62,16 +63,15 @@ class TwitterActions(private val applicationActivity: ApplicationActivity, priva
 
 
     private fun retweet(tweet: Tweet) {
-        val tweet1 = if (tweet.isRt) tweet.retweetedStatus else tweet
-        if (tweet1.isRetweeted)
+        if (tweet.isRetweeted)
             if (tweet.user.isProtected) {
                 applicationActivity.sendToast(applicationActivity.getString(R.string.can_not_be_retweet_protected_user))
                 return
             }
         threadPool.execute {
             try {
-                if (!tweet1.isRetweeted) {
-                    clientUser.twitter.retweetStatus(tweet1.id)
+                if (!tweet.isRetweeted) {
+                    clientUser.twitter.retweetStatus(tweet.id)
                 } else {
                     clientUser.twitter.destroyStatus(tweet.id)
                 }
@@ -121,7 +121,7 @@ class TwitterActions(private val applicationActivity: ApplicationActivity, priva
     }
 
     private fun reply(tweet: Tweet) {
-        //ToDo 未実装
+        TweetActivity.replyTweet(applicationActivity, clientUser, tweet)
     }
 
     private fun openTweetDetail(tweet: Tweet) {
@@ -133,18 +133,21 @@ class TwitterActions(private val applicationActivity: ApplicationActivity, priva
     }
 
 
-    private fun hashtagTweet(hasjtag: String) {
-        //ToDo 未実装
+    private fun hashtagTweet(hashtag: String) {
+        TweetActivity.hashtagTweet(applicationActivity, clientUser, hashtag)
     }
 
 
     private fun hashtagsTweet(tweet: Tweet) {
-        //ToDo 未実装
+        TweetActivity.hashtagsTweet(applicationActivity, clientUser, tweet.hashTags)
     }
 
 
     private fun showMenu(tweet: Tweet) {
+
+        val targetTweet = if (tweet.isRt) tweet.retweetedStatus else tweet
         val menuItems = ArrayList<MenuItem>()
+
         menuItems.add(MenuItem(Action.REPLY))
 
         if (!tweet.isFavorited)
@@ -158,42 +161,42 @@ class TwitterActions(private val applicationActivity: ApplicationActivity, priva
 
         menuItems.add(MenuItem(Action.OPEN_TWEET_DETAIL))
 
-        for (s in tweet.involvedUserNames) {
+        for (s in targetTweet.involvedUserNames) {
             menuItems.add(MenuItem(Action.OPEN_INVOLVED_USER_PROFILE, "@" + s))
         }
 
-        if (!tweet.inReplyToStatusId.equals(-1L))
+        if (!targetTweet.inReplyToStatusId.equals(-1L))
             menuItems.add(MenuItem(Action.SHOW_CONVERSATION))
 
-        if (!tweet.hashTags.isEmpty()) {
+        if (!targetTweet.hashTags.isEmpty()) {
             for (s in tweet.hashTags) {
                 menuItems.add(MenuItem(Action.TAG_TWEET, "#" + s))
             }
-            if (tweet.hashTags.size > 1)
+            if (targetTweet.hashTags.size > 1)
                 menuItems.add(MenuItem(Action.ALL_TAG_TWEET))
         }
 
-        if (!tweet.imageUris.isEmpty())
+        if (!targetTweet.imageUris.isEmpty())
             menuItems.add(MenuItem(Action.SHOW_MEDIA))
 
-        if (!tweet.imageUris.isEmpty()) {
+        if (!targetTweet.imageUris.isEmpty()) {
             for (s in tweet.uris) {
                 menuItems.add(MenuItem(Action.OPEN_URL, s))
             }
         }
 
-        val menuItemText = ArrayList<CharSequence>()
+        val menuItemTexts = ArrayList<CharSequence>()
         menuItems.forEach { menuItem ->
             if (menuItem.value == null) {
-                menuItemText.add(menuItem.action!!.actionName)
+                menuItemTexts.add(menuItem.action!!.actionName)
             } else {
-                menuItemText.add(menuItem.value!!)
+                menuItemTexts.add(menuItem.value!!)
             }
         }
 
         val alertDialog = AlertDialog.Builder(applicationActivity)
                 //.setCustomTitle(tweet.convertView(applicationActivity))
-                .setItems(menuItemText.toArray<CharSequence>(arrayOfNulls<CharSequence>(menuItemText.size))) { dialog, which ->
+                .setItems(menuItemTexts.toArray<CharSequence>(arrayOfNulls<CharSequence>(menuItemTexts.size))) { dialog, which ->
                     action(menuItems[which].action!!, tweet)
                     when (menuItems[which].action) {
                         TwitterActions.Action.TAG_TWEET -> hashtagTweet(menuItems[which].value!!)
@@ -224,11 +227,11 @@ class TwitterActions(private val applicationActivity: ApplicationActivity, priva
     }
 
     private fun quoteRetweet(tweet: Tweet) {
-        //ToDo 未実装
+        TweetActivity.quoteRetweet(applicationActivity, clientUser, tweet)
     }
 
     private fun openTweetActivity() {
-        //ToDo 未実装
+        applicationActivity.startActivity(TweetActivity::class.java, false)
     }
 
     private class MenuItem {
@@ -244,7 +247,6 @@ class TwitterActions(private val applicationActivity: ApplicationActivity, priva
             this.action = action
             this.value = value
         }
-
     }
 
 

@@ -3,6 +3,7 @@ package jp.ac.kcg.projectexercises.utill
 import android.content.Context
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
+import android.util.Log
 import com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper
 import com.j256.ormlite.dao.Dao
 import com.j256.ormlite.support.ConnectionSource
